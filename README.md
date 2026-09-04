@@ -7,6 +7,68 @@ Same rule as `graph/`: nothing here may break if ENS is removed, and nothing out
 *Status: design, 2026-09-04. No contracts written yet. The ENSv2 facts in §5 were read from the docs today and
 are marked with what the docs actually say, including that they are explicitly not final.*
 
+## 0. The demo, decided
+
+**The agent is `engram.eth` and what it remembers is this hackathon.**
+
+The name is not a coinage: `/mnt/newdata/qwen3.8` already calls the PLE patch server `ENGRAM_API`, and an
+engram is the neuroscience term for a memory trace physically encoded in tissue. That is what a patch is —
+memory in the weights, not in a database that gets searched.
+
+```
+engram.eth                    the agent's identity — ENSIP-26 records, reputation
+└─ hackathon.engram.eth       L1 public  — every bounty, rule and deadline. Expires when the event does.
+   └─ ourteam.engram.eth      L2 private — what we have built, what we have spent, what is left
+```
+
+The corpus is an **Open Knowledge Format** catalog (`ens/okf/`) — markdown with YAML frontmatter, directory
+structured, cross-linked; the format Google Cloud published in June 2026 for exactly this problem, org
+knowledge scattered across catalogs, wikis and people's heads. It lives in the node's aindrive folder, so the
+files are synced, capability-shared and change-tracked without us building any of that.
+
+### Why this memory and not another
+
+The first idea was ENS names — `name → address`. It is a bad target twice over. It is **one row**, which is
+the case a resolver already serves better and the case our own four-arm benchmark says arm B wins; and it is
+**hex**, which the trainer's tokenizer-boundary rule is most likely to skip. The rule that replaced it:
+*train what needs a wide scan, not what needs one row.* A hackathon catalog qualifies — "which bounties can I
+still enter with what we have built" needs every bounty AND our own state, which is two layers of the stack
+and more rows than a tool loop can read inside its context window. We measured that window: three tool calls
+against a Messari schema exhausted 8 192 tokens.
+
+### The five beats, and the two that are refusals
+
+| # | On stage | The ENSv2 feature carrying it |
+|---|---|---|
+| 1 | A judge asks what second place in the ENS track pays. The base model **invents a number**. Load `hackathon.engram.eth` → **1500**, no tool call, no network. | — the problem |
+| 2 | Edit one file in `okf/`, retrain on top, mint the child name. A stub-backed job **is refused by the registrar**. | custom registrar |
+| 3 | Another team's agent tries to load `ourteam.engram.eth` → **refused**, it holds no role. | Enhanced Access Control |
+| 4 | Our fork sells; the catalog's curator is paid up the lineage. | registrar business logic |
+| 5 | The event ends, the name **lapses**, the memory leaves the catalog. | expiring subnames |
+
+Beats 2 and 3 are the submission. Anyone can demo a transaction that succeeds; a transaction that is
+**refused** is what proves the permission is real.
+
+### Live versus pre-baked, said out loud
+
+Training is minutes per step, so nothing is trained on stage. Pre-baked: both knowledges. Live: editing a
+file, the GPU-free dry run that shows exactly which facts were extracted, the job submission, the Sepolia
+mint, the permission refusal, the expiry. The talk says which is which — a judge who asks and is told is
+convinced; a judge who asks and is dodged is not.
+
+### The extractor, and the rule it obeys
+
+`ens/okf-extract.mjs` turns the catalog into teachable facts **by rule and never by inference**. Frontmatter
+scalars are facts because they are declared fields; table rows are facts because the header names the relation
+and the leading cells name the subject. **Prose is not extracted and no model is asked to summarise anything
+into a training row** — a fabricated fact is worse than a missing one, which is the same rule the benchmark
+applies to fixtures. Every fact carries its file and its field, so a wrong answer in the trained model is
+traceable to a line somebody can fix, and the re-training after that fix is a derivative with a real parent.
+
+The consequence is that the catalog is *written to be extractable*: the ENS bounty's qualification rules are a
+table, not a bullet list, because "does this track need a live demo" has to be a fact and not a paragraph. That
+is a choice about how we author OKF, not a licence to guess at prose. Two files currently yield 20 facts.
+
 ## 1. The claim
 
 Ainize already has a hierarchy and refuses to admit it. Every knowledge carries `parents[]`, a `royaltySplit`
