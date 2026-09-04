@@ -101,14 +101,30 @@ export function extract(root) {
       if (t.header.length < 2) continue;
       for (const row of t.rows) {
         if (row.length !== t.header.length) { skipped.push({ file: rel, why: `table row has ${row.length} cells, header has ${t.header.length}`, row: row.join(' | ') }); continue; }
-        // The subject of a row is its leading cells; the relation is the column header.
-        const keyCols = t.header.length > 2 ? row.slice(0, t.header.length - 1) : [row[0]];
-        const keyNames = t.header.length > 2 ? t.header.slice(0, t.header.length - 1) : [t.header[0]];
-        for (let c = keyCols.length; c < t.header.length; c++) {
+        // The subject is the SHORTEST LEADING PREFIX of columns whose values are unique across the table —
+        // derived from the data, not from the column count. A wide entity table (address, symbol, name, fee,
+        // …) has a unique first column and every other column is a separate relation about that entity; a
+        // composite table (Track, Place, Amount) needs two columns before rows become distinguishable.
+        // Assuming "all but the last column is the key" produced one fact per row with six clauses in the
+        // question, which is the shape of a question nobody asks.
+        const keyWidth = t.keyWidth ?? (t.keyWidth = (() => {
+          for (let w = 1; w < t.header.length; w++) {
+            const seen = new Set(t.rows.map((r) => r.slice(0, w).join('\u0000')));
+            if (seen.size === t.rows.length) return w;
+          }
+          return t.header.length - 1;
+        })());
+        const keyCols = row.slice(0, keyWidth);
+        const keyNames = t.header.slice(0, keyWidth);
+        for (let c = keyWidth; c < t.header.length; c++) {
           const value = row[c];
           if (!value || value === '—' || value === '-') continue;
           const where = keyCols.map((v, n) => `${keyNames[n]} ${v}`).join(', ');
-          const ctx = t.heading ? `${t.heading} of ${subject}` : subject;
+          // Do not say "Vaults of arrakis-finance of arrakis-finance": a heading that already names the
+          // document's subject is the context on its own.
+          const ctx = !t.heading ? subject
+            : t.heading.toLowerCase().includes(String(subject).toLowerCase()) ? t.heading
+            : `${t.heading} of ${subject}`;
           facts.push({
             id: `tb:${sha8(rel + t.line + row.join('|') + t.header[c])}`,
             prompt: `In the ${ctx}, what is the ${t.header[c].toLowerCase()} for ${where}?`,
