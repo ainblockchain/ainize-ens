@@ -79,15 +79,43 @@ The demo moment is the negative one: **the author's key tries to write its own a
 transaction reverts.** That is a security property a judge can watch happen in ten seconds, and it is exactly
 the "delegate specific rights — like letting an account edit only certain text records" the track asks for.
 
+**The mechanism, and the constraint it imposes on the design.** The Permissioned Resolver derives a resource
+as `keccak256(node, part)` where `part` is zero for the whole name and `keccak256(key)` for one record, and it
+exposes `authorizeTextRoles(toName, key, account, grant)`, which grants `ROLE_SET_TEXT` **for that one key**,
+against `authorizeNameRoles`, which grants it for every key on the name.
+
+That is per-exact-key, not per-prefix: **there is no way to grant `attestation.*` as a wildcard.** Three
+consequences the contracts have to be built around, and the first is the one that would quietly destroy the
+property if it were missed:
+
+1. **The author must never receive a name-level grant.** `authorizeNameRoles` on the author would hand them
+   every key including the attestation records, and the guarantee evaporates while the table above still reads
+   correctly. The author gets per-key grants — `description`, `price`, `dataset.access` — and nothing else.
+2. **Each verifier is granted its own exact key**, e.g. `attestation.0x430b3A37…` for node-b. Workable because
+   the verifier's address is known when it joins the quorum, and it has a pleasant side effect: a verifier
+   cannot overwrite another verifier's attestation either.
+3. The key set is therefore **enumerable and fixed at grant time**, which means the record schema is part of
+   the contract design rather than a convention. That is a cost, and it is also why the negative test passes:
+   the author's transaction reverts because the author was never granted that key, not because something
+   checked a prefix at runtime.
+
 ## 4. The rest of the state machine falls out
 
 | Ainize today | ENSv2 mechanism |
 |---|---|
 | DRAFT (taught, not yet verified) | an **expiring** subname — a training run that never passes quorum loses its name |
-| SUPERSEDED | **record aliasing** to the successor, instead of a catalog field readers must know to check |
+| SUPERSEDED | **record aliasing** (`setAlias(fromName, toName)`) to the successor — but see the caveat below |
 | branches | **namespace aliasing** via a shared registry |
 | a knowledge nobody may revoke | a forever name with no parent control |
 | merge (two parents) | **open problem** — a tree cannot express two parents; see §6 |
+
+**Caveat on supersession, found in the resolver docs and not yet resolved.** `setAlias` requires
+`ROLE_SET_ALIAS`, which is **root-only** — it is not a per-name role an author can hold. So "this knowledge is
+superseded by that one" would be an action of the resolver root, not of the author, which either centralises a
+decision Ainize currently lets the author make, or means supersession is expressed as an ordinary text record
+pointer (`superseded_by`) and aliasing is reserved for cases the root really should control. The docs also
+note cycle detection on self-reference, with longer cycles able to run out of gas — a lineage that supersedes
+in a loop is a real possibility in a fork-and-merge product and must be prevented on our side, not theirs.
 
 **Agents (the bonus).** Ainize's agent already buys over x402 with `--max-price`, and the MCP work will let
 Claude Code and Cursor teach and buy directly. Give it `myagent.ainize.eth` with ENSIP-26 records and EAC
@@ -116,9 +144,28 @@ Recorded because the design above depends on it and because the docs warn they a
   `revokeRoles`, `grantRootRoles`, `revokeRootRoles`; views `roles()`, `hasRoles()`, `roleCount()`.
 - **Per-record scoping is real**: the Permissioned Resolver ships 11 roles, 8 of them per-record, scoped down
   to individual keys and coin types — which is what §3's table needs.
-- **"The contracts and interfaces described here are not yet final and may change prior to mainnet."** The
-  Sepolia addresses were not on the pages read; they are in the docs' Deployments table and must be read from
-  there before any code is written.
+- **"The contracts and interfaces described here are not yet final and may change prior to mainnet."** Treat
+  every address and signature below as a moving target and re-read before writing code.
+
+### 5.1 Sepolia (ENSv2 beta), chain id 11155111 — read from the docs' Deployments table, 2026-09-04
+
+The ones this design touches:
+
+| Contract | Address |
+|---|---|
+| VerifiableFactory | `0x10dc6333cdfe1fcef624c6e0a8221b91804cd7ef` |
+| UserRegistryImpl | `0x624a25d67b59d587752ebec8dded8827dae52050` |
+| PermissionedResolverImpl | `0x9eae5c2730a7dd16bdd1dee6421a1b91e3b0365e` |
+| RootRegistry | `0x8115186e8f2e0b0281e86ab91f0f48ba90364354` |
+| ETHRegistry | `0xbdc85dd5b15d7ecb354cd7cb6f2c50b4f2c4f0e2` |
+| ETHRegistrar | `0xa88553f454b77203b0d036a05c894d555eaaa2cc` |
+| UniversalResolverV2 | `0x4a1817d13e9cf196f471725176355c1234b63c70` |
+| ENSV2Resolver | `0x508cb4e4596429ca98a1bb3112d88d18f92456b5` |
+
+Also on the list and worth knowing about: `MockUSDC` / `MockDAI` (the registrar tutorial takes an ERC20
+payment token, so the royalty path has something to charge in on testnet), `StandardRentPriceOracle`, and a
+`Graveyard`. Nothing here is copied into code yet — when the registrar is written, the addresses come from a
+config file that names this table and its date, not from constants pasted into a contract.
 
 ## 6. Open questions, honestly
 
