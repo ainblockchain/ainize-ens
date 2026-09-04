@@ -104,6 +104,7 @@ A subname under a knowledge cannot be bought. It is minted by a **teach job** wh
 | `pre_state_sha256` | training started from the parent's actual checkpoint, not from scratch |
 | `patch_sha256` of the produced patch | the name resolves to the artefact that was actually trained |
 | benchmark score + verifier quorum | the child passes its own benchmark on ≥ 2 distinct runtimes |
+| locality gate | unrelated answers survived the training — **bounded by the gate, see below** |
 | `backend: gradient \| stub` | **a stub-backed job can never mint a name** |
 
 That last row is the same mechanical stub rule the benchmark work already enforces (`graph/bench/README.md`
@@ -115,6 +116,40 @@ top of.** `myfork.final.krx.ainize.eth` existing is proof that a gradient run st
 checkpoint and beat its own benchmark. Ainize's economic rule (contributor share 0.7 of the seller
 remainder, royalties along the lineage) moves into the registrar contract, which is where the ENSv2 tutorial
 puts business logic: the registrar validates and collects, then calls the registry's `register()`.
+
+### What the mint condition actually guarantees, today
+
+The claim this design wants to make is "a name in this tree is proof that a GPU learned something without
+breaking what the model already knew". The second half of that sentence is currently weaker than it sounds,
+and the submission must not ship the strong version.
+
+The product's publish gate is `locality.ok && parent_regression.ok` (`packages/node/src/teach.ts:67`), where
+locality is `DEFAULT_LOCALITY_PROMPTS` — 12 unrelated prompts, `minSame: 11`, so one failure is tolerated
+(`packages/core/src/config.ts:48,76`). Measured 2026-09-04: **4 of those 12 are also in the trainer's contrast
+set** (`teach_contrast.json`) — 2 verbatim, 2 a paraphrase apart. Contrast exists to hold unrelated rows in
+place while the targets are pulled, so those four prompts are trained to survive the very check that scores
+them. A third of the gate is pre-secured by construction, in shipped code, for every knowledge Ainize has ever
+published.
+
+So the honest reading of a name minted today is: *8 of 12 unrelated prompts held, and 4 more were trained to
+hold.* That is not something to mint on, and it is not something to put in front of judges.
+
+The fix is on the contrast side, not the gate side — shrinking a buyer's only safety check to make our own
+numbers work would be solving our problem with their protection. Four contrast items are being replaced with
+general-knowledge pairs that collide with nothing, and the disjointness is being asserted in a test so it
+cannot regress silently. Two consequences for this submission, both of which we accept rather than route
+around:
+
+1. **Our knowledges must be trained after that fix lands**, so the demo's names are minted on a clean gate.
+   That is a scheduling constraint, not a caveat.
+2. **The four knowledges already attested on the demo cluster were published under the old gate.** If the
+   submission references them at all, it says so. Neither they nor anything trained before the fix may be
+   described as verified against side effects.
+
+The collision rule that makes the fix correct is worth recording, because the obvious version is wrong:
+similarity alone rejects "What is the capital of Canada?" against "What is the capital of Italy?" for sharing
+a template, but training on Rome does not pre-secure Ottawa. Leakage is about the ANSWER, not the sentence —
+identical question, or a paraphrase that shares the answer.
 
 ### The dataset travels with the name
 
