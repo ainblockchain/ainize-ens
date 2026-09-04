@@ -7,67 +7,86 @@ Same rule as `graph/`: nothing here may break if ENS is removed, and nothing out
 *Status: design, 2026-09-04. No contracts written yet. The ENSv2 facts in §5 were read from the docs today and
 are marked with what the docs actually say, including that they are explicitly not final.*
 
-## 0. The demo, decided
+## 0. The demo, decided — an agent family
 
-**The agent is `engram.eth` and what it remembers is this hackathon.**
+**The agent is `engram.eth`, and what the tree records is descent: which agent was trained on top of which.**
 
-The name is not a coinage: `/mnt/newdata/qwen3.8` already calls the PLE patch server `ENGRAM_API`, and an
-engram is the neuroscience term for a memory trace physically encoded in tissue. That is what a patch is —
+The name is not a coinage — `/mnt/newdata/qwen3.8` already calls the PLE patch server `ENGRAM_API`, and an
+engram is the neuroscience term for a memory trace physically encoded in tissue. That is what a patch is:
 memory in the weights, not in a database that gets searched.
 
 ```
-engram.eth                    the agent's identity — ENSIP-26 records, reputation
-└─ hackathon.engram.eth       L1 public  — every bounty, rule and deadline. Expires when the event does.
-   └─ ourteam.engram.eth      L2 private — what we have built, what we have spent, what is left
+engram.eth                            the ancestor — base model, knows nothing special. The control.
+└─ defi.engram.eth                    VOCABULARY — what a vault, a market, a pool IS (Messari schema)
+   ├─ vaults.defi.engram.eth          the vaults of 15 live protocols, pinned at block 25902936
+   ├─ lending.defi.engram.eth         the lending markets — a SIBLING, disjoint facts
+   └─ risk.vaults.defi.engram.eth     one fund's policy. Private.
 ```
 
-The corpus is an **Open Knowledge Format** catalog (`ens/okf/`) — markdown with YAML frontmatter, directory
-structured, cross-linked; the format Google Cloud published in June 2026 for exactly this problem, org
-knowledge scattered across catalogs, wikis and people's heads. It lives in the node's aindrive folder, so the
-files are synced, capability-shared and change-tracked without us building any of that.
+Descent is a checkable claim here, not a metaphor: a child is minted only if a teach job proves it started
+from the parent's checkpoint (`pre_state_sha256`), produced the artefact the name resolves to
+(`patch_sha256`), passed its own benchmark on two distinct runtimes, and ran on a real gradient backend. A
+stub-backed job mints nothing.
+
+### Why an agent family rather than a knowledge tree
+
+Three relations have to actually work, or a lineage is a list with indentation:
+
+1. **Inheritance — one question, four answers.** *"Where should I put 10 WETH?"* The ancestor invents an
+   address that does not exist; `defi.` explains what a vault is and names nothing; `vaults.` names real
+   vaults with real TVL; `risk.vaults.` names the same ones minus what its policy excludes. Four answers side
+   by side make inheritance visible — each generation's contribution IS the difference.
+2. **Sibling delegation — and this is the relation nothing else gives.** Ask `vaults.` about a lending rate
+   and it does not know; it delegates to `lending.`, and the delegation works because both descend from
+   `defi.` and share its vocabulary. **A common ancestor is what lets two agents that have never met talk to
+   each other, and ENS is what proves the descent.**
+3. **Permission inheritance.** `risk.vaults.` is private: another fund's agent that tries to load it is
+   refused, holding no role. And an agent spawning a sub-agent grants it a SUBSET of its own EAC roles — buy
+   only under this lineage, up to this ceiling. That is the delegated autonomy the bounty's bonus asks for.
 
 ### Why this memory and not another
 
-The first idea was ENS names — `name → address`. It is a bad target twice over. It is **one row**, which is
-the case a resolver already serves better and the case our own four-arm benchmark says arm B wins; and it is
-**hex**, which the trainer's tokenizer-boundary rule is most likely to skip. The rule that replaced it:
-*train what needs a wide scan, not what needs one row.* A hackathon catalog qualifies — "which bounties can I
-still enter with what we have built" needs every bounty AND our own state, which is two layers of the stack
-and more rows than a tool loop can read inside its context window. We measured that window: three tool calls
-against a Messari schema exhausted 8 192 tokens.
+The first idea was ENS names — `name → address`. Bad twice: it is ONE ROW, which is the case a resolver
+serves better and the case our own four-arm benchmark says the tool arm wins; and it is hex, the shape the
+trainer's tokenizer-boundary rule is likeliest to skip. The rule that replaced it: **train what needs a wide
+scan, not what needs one row.**
 
-### The five beats, and the two that are refusals
+Onchain protocol memory qualifies, and the measurement is ours. Arm B — a model with The Graph's MCP —
+finishes 172 of 500 completions in two calls or fewer and **hits a wall on 30% that more budget does not
+climb**: those items are not running out of calls, they are failing to converge. And arm B is **seven times
+less stable** than the same model without tools, changing its actual answer on 6% of items where the tool-less
+arm has never changed one in 1 000 completions. A wide scan over 15 protocols at a pinned block is exactly
+where a tool loop is weakest and compiled memory has nothing to look up.
+
+The failure also has money attached. Ask the ancestor for a pool address and it produces a plausible one; send
+funds there and they are gone. A judge can check the address in ten seconds.
+
+### The beats, and the two that are refusals
 
 | # | On stage | The ENSv2 feature carrying it |
 |---|---|---|
-| 1 | A judge asks what second place in the ENS track pays. The base model **invents a number**. Load `hackathon.engram.eth` → **1500**, no tool call, no network. | — the problem |
-| 2 | Edit one file in `okf/`, retrain on top, mint the child name. A stub-backed job **is refused by the registrar**. | custom registrar |
-| 3 | Another team's agent tries to load `ourteam.engram.eth` → **refused**, it holds no role. | Enhanced Access Control |
-| 4 | Our fork sells; the catalog's curator is paid up the lineage. | registrar business logic |
-| 5 | The event ends, the name **lapses**, the memory leaves the catalog. | expiring subnames |
+| 1 | One question, four agents, four answers — the ancestor's is a hallucinated address | — the problem |
+| 2 | Train a child on a parent's checkpoint and mint its name. A stub-backed job **is refused** | custom registrar |
+| 3 | Another fund's agent tries to load `risk.vaults.` → **refused**, holds no role | Enhanced Access Control |
+| 4 | `vaults.` cannot answer a lending question and delegates to its sibling on shared vocabulary | the hierarchy itself |
+| 5 | The child sells; the vocabulary curator is paid up the lineage | registrar business logic |
 
 Beats 2 and 3 are the submission. Anyone can demo a transaction that succeeds; a transaction that is
 **refused** is what proves the permission is real.
 
 ### Live versus pre-baked, said out loud
 
-Training is minutes per step, so nothing is trained on stage. Pre-baked: both knowledges. Live: editing a
-file, the GPU-free dry run that shows exactly which facts were extracted, the job submission, the Sepolia
-mint, the permission refusal, the expiry. The talk says which is which — a judge who asks and is told is
-convinced; a judge who asks and is dodged is not.
+Training is hours, so nothing is trained on stage. Pre-baked: the patches. Live: the GPU-free dry run showing
+which facts were extracted, the job submission, the Sepolia mint, the permission refusal, the delegation. The
+talk says which is which.
 
-### The extractor, and the rule it obeys
+### What is real today
 
-`ens/okf-extract.mjs` turns the catalog into teachable facts **by rule and never by inference**. Frontmatter
-scalars are facts because they are declared fields; table rows are facts because the header names the relation
-and the leading cells name the subject. **Prose is not extracted and no model is asked to summarise anything
-into a training row** — a fabricated fact is worse than a missing one, which is the same rule the benchmark
-applies to fixtures. Every fact carries its file and its field, so a wrong answer in the trained model is
-traceable to a line somebody can fix, and the re-training after that fix is a derivative with a real parent.
-
-The consequence is that the catalog is *written to be extractable*: the ENS bounty's qualification rules are a
-table, not a bullet list, because "does this track need a live demo" has to be a fact and not a paragraph. That
-is a choice about how we author OKF, not a licence to guess at prose. Two files currently yield 20 facts.
+The facts for `defi.`, `vaults.` and `lending.` are already pulled and pinned — 15 live protocols at block
+25902936, 186 study facts, raw gateway responses committed. `risk.` is the layer we author, which is correct:
+it is the subjective one, and a subjective layer is exactly why the tree must be a tree of forks rather than
+a canonical registry. `vaults.` also carries something no other submission will have: a **published
+benchmark** — 250 pre-registered items, a declared ordering, a measured instrument floor.
 
 ## 1. The claim
 
