@@ -1,5 +1,5 @@
 {
-  "_comment": "Copy to ~/.ainize/names.json (or <NGRAM_HOME>/names.json) to make `ainize patch <name>` resolve without an RPC. Each entry carries the two things the old three-command sequence supplied by hand: which node to fetch from, and which knowledge to ask for.",
+  "_comment": "Copy to ~/.ainize/names.json (or <AINIZE_HOME>/names.json) to make `ainize patch <name>` resolve without an RPC. Each entry carries the two things the old three-command sequence supplied by hand: which node to fetch from, and which knowledge to ask for.",
   "engram.eth":                   { "node": "http://localhost:3402", "patch": "<the ancestor's id>" },
   "defi.engram.eth":              { "node": "http://localhost:3402", "patch": "<vocabulary layer>" },
   "vaults.defi.engram.eth":       { "node": "http://localhost:3402", "patch": "graph-r1-armc" },
