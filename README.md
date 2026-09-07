@@ -80,6 +80,40 @@ Training is hours, so nothing is trained on stage. Pre-baked: the patches. Live:
 which facts were extracted, the job submission, the Sepolia mint, the permission refusal, the delegation. The
 talk says which is which.
 
+### One line to use a name
+
+`ainize patch <name>` is the command the family exists to make possible. It replaces a sequence in which the
+operator carried an id between two machines by hand:
+
+```
+ainize patch ls --node http://their-node:3402 --status LISTED -q "<topic>"
+ainize login && ainize use <id>
+```
+
+becomes
+
+```
+ainize patch vaults.defi.engram.eth
+```
+
+The name supplies exactly what those lines supplied by hand: the `ainize.node` text record is the `--node` of
+the first, and `ainize.patch` is the `<id>` of the third. Resolution reads a local names file first — which is
+what makes the command work offline and before a name is registered — and falls back to
+`registry.resolver(namehash)` then `resolver.text(namehash, key)` over JSON-RPC when both an RPC and a
+registry address are given. **The registry address is never assumed**: ENSv2's docs say its contracts are not
+final, and an address hard-coded here would resolve confidently against the wrong registry.
+
+**The buying still happens on your own node.** `--node` in `patch ls` points at the seller because you are
+reading their catalogue; `use` has always run locally, because your node is what pays, downloads and applies.
+A command that logged you into someone else's node and applied knowledge there would be a different operation
+wearing this one's name, so the seller's endpoint is used only for what it is for — telling your node where to
+fetch from, as a peer.
+
+Verified end to end against a live node: resolve → peer → log in → use, with `--resolve-only` and `--no-apply`
+for the paths that must not spend money or touch a shared model. Nine offline tests pin the resolution half,
+including the two canonical namehash vectors — the hash must be keccak256, and node's built-in `sha3-256` is
+not it.
+
 ### What is real today
 
 The facts for `defi.`, `vaults.` and `lending.` are already pulled and pinned — 15 live protocols at block
