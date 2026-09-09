@@ -6,7 +6,7 @@ layer: vaults
 block: 25902936
 description: Facts read from the badgerdao subgraph at block 25902936, through The Graph's decentralized gateway.
 tags: [vaults, badgerdao, block-25902936]
-timestamp: 2026-09-04T18:53:07Z
+timestamp: 2026-09-09T05:06:26Z
 ---
 
 # Provenance

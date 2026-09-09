@@ -3,7 +3,7 @@ type: Knowledge Catalog
 title: DeFi Vocabulary
 description: What a vault, a lending market and a liquidity pool are under the Messari standardized schema — the layer every descendant inherits.
 tags: [messari, vocabulary]
-timestamp: 2026-09-04T18:53:07Z
+timestamp: 2026-09-09T05:06:26Z
 ---
 
 # Why this layer exists

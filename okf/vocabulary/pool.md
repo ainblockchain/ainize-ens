@@ -3,7 +3,7 @@ type: Schema Term
 title: Liquidity Pool
 description: A DEX liquidity pool holding two or more tokens. Note inputTokens is PLURAL, which is the field that most often breaks a query written against the vault schema.
 tags: [messari, schema, vocabulary]
-timestamp: 2026-09-04T18:53:07Z
+timestamp: 2026-09-09T05:06:26Z
 ---
 
 # What it is

@@ -24,20 +24,30 @@
  *   policy/       -> risk.vaults.defi...          authored, never generated
  */
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { join, dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const argv = (() => {
   const a = {}; const v = process.argv.slice(2);
   for (let i = 0; i < v.length; i++) if (v[i].startsWith('--')) a[v[i].slice(2)] = v[i + 1]?.startsWith('--') ? true : v[++i];
   return a;
 })();
-const ROOT = '/mnt/newdata/ainize/knowledge-marketplace';
-const OUT = join(ROOT, argv.out ?? 'ens/okf');
-const FACTS = join(ROOT, argv.facts ?? 'graph/bench/data/r1/facts.jsonl');
-const MANIFEST = join(ROOT, 'graph/bench/data/r1/pull/manifest.json');
+/**
+ * Paths resolve from this file, not from one machine's checkout: `ROOT` was the absolute path of the monorepo
+ * on the author's disk, so a clone anywhere else wrote its output back into that directory if it happened to
+ * exist and died if it did not.
+ *
+ * The facts and the pull manifest are produced by ainize-bench, a separate repository. Point `--bench` at a
+ * checkout of it (default: a sibling directory), or name the two files outright with `--facts` / `--manifest`.
+ */
+const HERE = dirname(fileURLToPath(import.meta.url));
+const BENCH = argv.bench ?? join(HERE, '..', 'ainize-bench');
+const OUT = argv.out ? resolve(argv.out) : join(HERE, 'okf');
+const FACTS = argv.facts ? resolve(argv.facts) : join(BENCH, 'bench/data/r1/facts.jsonl');
+const MANIFEST = argv.manifest ? resolve(argv.manifest) : join(BENCH, 'bench/data/r1/pull/manifest.json');
 
 const die = (m) => { console.error(`okf-build: ${m}`); process.exit(1); };
-if (!existsSync(FACTS)) die(`${FACTS} does not exist — run the pull and facts pipeline first. No catalog is invented.`);
+if (!existsSync(FACTS)) die(`${FACTS} does not exist — it is built by ainize-bench (github.com/ainblockchain/ainize-bench).\n  Pass --bench <checkout> or --facts <file>. No catalog is invented.`);
 
 const facts = readFileSync(FACTS, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l));
 const manifest = existsSync(MANIFEST) ? JSON.parse(readFileSync(MANIFEST, 'utf8')) : null;

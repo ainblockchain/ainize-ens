@@ -3,7 +3,7 @@ type: Schema Term
 title: Vault
 description: A tokenized vault: depositors put in an input token and receive an output (share) token. Balances, fees and price-per-share are properties of the vault.
 tags: [messari, schema, vocabulary]
-timestamp: 2026-09-04T18:53:07Z
+timestamp: 2026-09-09T05:06:26Z
 ---
 
 # What it is
