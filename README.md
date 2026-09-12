@@ -117,7 +117,10 @@ not it.
 ### What is real today
 
 The facts for `defi.`, `vaults.` and `lending.` are already pulled and pinned — 15 live protocols at block
-25902936, 186 study facts, raw gateway responses committed. `risk.` is the layer we author, which is correct:
+25902936, raw gateway responses committed, and `okf-extract.mjs` reads **1,707 facts** off them by rule —
+frontmatter scalars and table rows, never prose, never a model's summary. The lesson trained on 2026-09-12
+takes a 200-row slice of that, chosen to carry all three layers rather than the alphabetically-first corner:
+42 schema and policy rows, 40 deployment identities, 118 instance rows. `risk.` is the layer we author, which is correct:
 it is the subjective one, and a subjective layer is exactly why the tree must be a tree of forks rather than
 a canonical registry. `vaults.` also carries something no other submission will have: a **published
 benchmark** — 250 pre-registered items, a declared ordering, a measured instrument floor.
