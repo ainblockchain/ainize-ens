@@ -122,6 +122,21 @@ it is the subjective one, and a subjective layer is exactly why the tree must be
 a canonical registry. `vaults.` also carries something no other submission will have: a **published
 benchmark** — 250 pre-registered items, a declared ordering, a measured instrument floor.
 
+**The contract compiles.** `contracts/EngramRegistrar.sol` was written against documentation with no solc on
+the machine, and its own header said so. It now builds with solc 0.8.28 against the real ENSv2 interfaces —
+3,898 bytes of runtime, 26 ABI entries — and `contracts/compile.mjs` reproduces that in one command. Two
+things only a compile could have told us, both load-bearing for anyone deploying it:
+
+- **`@ensdomains/contracts-v2` is not a package.** It does not exist on npm. ENSv2 ships as the
+  `ensdomains/namechain` repository, and the import prefix has to be remapped to `contracts/src` inside it.
+  Left alone, solc reports a missing file and says nothing about where the file lives.
+- **`viaIR` is required, not preferred.** Without it the mint path is "stack too deep", so a plain compile
+  fails in a way that reads like a broken contract rather than a compiler setting.
+
+What a compile does not buy: it is still unaudited, still undeployed, and the upstream docs still say these
+interfaces "are not yet final and may change prior to mainnet deployment". It is evidence the shapes match
+today.
+
 ## 1. The claim
 
 Ainize already has a hierarchy and refuses to admit it. Every knowledge carries `parents[]`, a `royaltySplit`

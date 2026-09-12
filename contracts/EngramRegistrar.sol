@@ -8,10 +8,20 @@ import {RegistryRolesLib} from "@ensdomains/contracts-v2/registry/libraries/Regi
 /**
  * EngramRegistrar — a subname is minted by a verified training run, not bought.
  *
- * NOT AUDITED, NOT COMPILED. Written against the ENSv2 tutorial's SimpleSubnameRegistrar, whose docs state
- * the interfaces "are not yet final and may change prior to mainnet deployment". No solc is installed on the
- * machine this was written on, so nothing here has been through a compiler — treat every signature as
- * checked against documentation and nothing more.
+ * NOT AUDITED. COMPILED: solc 0.8.28 with `viaIR`, against the real ENSv2 interfaces from ensdomains/namechain
+ * (`contracts/src/registry`) and OpenZeppelin 5 — 3,898 bytes of runtime, 26 ABI entries. Every signature this
+ * calls was checked by the compiler against the actual source, not against documentation: `register(string,
+ * address,IRegistry,address,uint256,uint64)` on IStandardRegistry, `getState`/`Status` on
+ * IPermissionedRegistry, and the five role constants in RegistryRolesLib.
+ *
+ * `viaIR` is required, not a preference: without it the mint path is "stack too deep". That is a property of
+ * this contract as written and will not change on its own.
+ *
+ * The import prefix below names a package that does not exist on npm — ENSv2 is distributed as the
+ * `ensdomains/namechain` repository. Whoever deploys this remaps that prefix to `namechain/contracts/src`,
+ * which is what `contracts/compile.mjs` does. The upstream docs still state these interfaces
+ * "are not yet final and may change prior to mainnet deployment", so a compile today is evidence the shapes
+ * match today and nothing more.
  *
  * WHY IT EXISTS. The reference registrar's business logic is a price: pay, and the name is yours. Ours is a
  * proof of computation. `engram.eth` names an agent family in which each generation is trained on top of its
