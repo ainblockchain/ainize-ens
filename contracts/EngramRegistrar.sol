@@ -226,6 +226,7 @@ contract EngramRegistrar {
     }
 
     function isAvailable(string calldata label) public view returns (bool) {
+        if (lineageOf[keccak256(bytes(label))].patchSha256 != bytes32(0)) return false;
         IPermissionedRegistry.State memory state = REGISTRY.getState(uint256(keccak256(bytes(label))));
         return state.status == IPermissionedRegistry.Status.AVAILABLE;
     }

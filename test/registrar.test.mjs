@@ -101,6 +101,11 @@ test('requires distinct verifier signatures and the full quorum', async () => {
   await rejected(value, 'SignerNotVerifier', { signatures: ['0x'] });
 });
 
+test('cannot mint over a root anchor even when its registry label is unused', async () => {
+  await rejected(await attestation({ label: 'defi' }), 'NotAvailable');
+  assert.equal((await registrar.lineageOf(parentLabel)).patchSha256, parentPatch);
+});
+
 test('binds the recipient, resolver, and lease to the signed attestation', async () => {
   const value = await attestation();
   await rejected(value, 'InvalidMintTarget', { owner: Wallet.createRandom().address });

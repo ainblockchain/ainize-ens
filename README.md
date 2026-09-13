@@ -7,10 +7,11 @@ The sections below preserve the design history; they are not a checklist of depl
 
 On September 13, the registrar gained signed recipient, resolver, and duration fields. Previously a
 caller could reuse valid verifier signatures with a different mint recipient or resolver. The contract
-now rejects that substitution, zero quorum, a null verifier, and replacement of an anchored checkpoint.
+now rejects that substitution, zero quorum, a null verifier, and replacement of an anchored checkpoint
+through either the admin anchor function or a mint that collides with the root label.
 Existing attestation signers must adopt the new tuple and digest before using this version.
 
-`npm run build && npm test` compiles with solc 0.8.28 and runs seven executable contract tests:
+`npm run build && npm test` compiles with solc 0.8.28 and runs eight executable contract tests:
 valid mint/replay, stub and ancestry rejection, locality and benchmark gates, quorum uniqueness,
 signature-bound mint targets, immutable roots, and deployment configuration checks. These tests use a
 **local registry fixture**, not Sepolia, and do not establish ENSv2 bounty eligibility by themselves.
