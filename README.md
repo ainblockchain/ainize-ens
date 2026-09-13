@@ -118,9 +118,20 @@ not it.
 
 The facts for `defi.`, `vaults.` and `lending.` are already pulled and pinned — 15 live protocols at block
 25902936, raw gateway responses committed, and `okf-extract.mjs` reads **1,707 facts** off them by rule —
-frontmatter scalars and table rows, never prose, never a model's summary. The lesson trained on 2026-09-12
-takes a 200-row slice of that, chosen to carry all three layers rather than the alphabetically-first corner:
-42 schema and policy rows, 40 deployment identities, 118 instance rows. `risk.` is the layer we author, which is correct:
+frontmatter scalars and table rows, never prose, never a model's summary. The lesson trains an **82-row slice**, and
+which 82 is a finding rather than a preference.
+
+The first attempt trained the sibling dataset — 119 address→symbol facts from the same pull — and the product's
+own publish gate refused it: `locality 3/10`, meaning seven unrelated answers moved. The cause was the footprint.
+Those 119 facts touched **49,825 memory rows**, 419 per fact, because a 42-character hex address tokenises long
+and gives every fact an enormous n-gram reach. A patch that rewrites fifty thousand rows disturbs answers nobody
+asked about, and more training passes raise accuracy and footprint together — the two gates move in opposite
+directions.
+
+So the slice taken here is the part of the catalog a person asks in words: the schema terms, the policy, and each
+deployment's declared identity, with **every row carrying a hex address dropped**. `What is the layer of
+aave-amm?` → `lending` is a fact worth compiling into memory. `What is the token symbol of the vault at
+0x50379f…?` is a fact worth looking up, and the gate is what told us the difference. `risk.` is the layer we author, which is correct:
 it is the subjective one, and a subjective layer is exactly why the tree must be a tree of forks rather than
 a canonical registry. `vaults.` also carries something no other submission will have: a **published
 benchmark** — 250 pre-registered items, a declared ordering, a measured instrument floor.
