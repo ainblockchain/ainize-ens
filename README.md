@@ -1,5 +1,29 @@
 # ens/ — ENSv2 as Ainize's namespace, and the training run as the thing that mints a name
 
+## ETHOnline 2026 Continuity delivery
+
+The submission entry point is [ainblockchain/ainize](https://github.com/ainblockchain/ainize).
+The sections below preserve the design history; they are not a checklist of deployed features.
+
+On September 13, the registrar gained signed recipient, resolver, and duration fields. Previously a
+caller could reuse valid verifier signatures with a different mint recipient or resolver. The contract
+now rejects that substitution, zero quorum, a null verifier, and replacement of an anchored checkpoint.
+Existing attestation signers must adopt the new tuple and digest before using this version.
+
+`npm run build && npm test` compiles with solc 0.8.28 and runs seven executable contract tests:
+valid mint/replay, stub and ancestry rejection, locality and benchmark gates, quorum uniqueness,
+signature-bound mint targets, immutable roots, and deployment configuration checks. These tests use a
+**local registry fixture**, not Sepolia, and do not establish ENSv2 bounty eligibility by themselves.
+Deployment and live permission evidence are a separate requirement. The registrar still trusts its
+owner-approved verifier set; it does not independently run the GPU benchmark on Ethereum.
+
+The registrar records parent relationships, but a single instance registers its children in one
+registry. The multigeneration hierarchical registry deployment, sibling agent delegation, private
+model access enforcement, and ancestor royalty payout described in the design remain separate work;
+do not infer them from a successful registrar mint or from a resolver permission check.
+
+---
+
 Everything that touches **ENS** lives here, kept apart from the marketplace packages so it can be opened as a
 standalone public repository (a hackathon submission needs one) without dragging the rest of Ainize with it.
 Same rule as `graph/`: nothing here may break if ENS is removed, and nothing outside here may depend on it.

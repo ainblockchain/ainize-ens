@@ -1,0 +1,19 @@
+{
+  "name": "@ainize/ens",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node contracts/compile.mjs",
+    "test": "node --test test/*.test.mjs",
+    "deploy:sepolia": "node scripts/deploy-sepolia.mjs"
+  },
+  "dependencies": {
+    "ethers": "6.15.0"
+  },
+  "devDependencies": {
+    "@openzeppelin/contracts": "5.4.0",
+    "ganache": "7.9.2",
+    "solc": "0.8.28"
+  }
+}

@@ -19,7 +19,7 @@
  * a compiler and every signature in it was checked against documentation only.
  */
 import solc from 'solc';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -35,7 +35,7 @@ const resolve = (p) => [
 const input = {
   language: 'Solidity',
   sources: { 'EngramRegistrar.sol': { content: readFileSync(join(here, 'EngramRegistrar.sol'), 'utf8') } },
-  settings: { viaIR: true, optimizer: { enabled: true, runs: 200 }, outputSelection: { '*': { '*': ['abi', 'evm.bytecode.object'] } } },
+  settings: { viaIR: true, evmVersion: 'shanghai', optimizer: { enabled: true, runs: 200 }, outputSelection: { '*': { '*': ['abi', 'evm.bytecode.object'] } } },
 };
 const out = JSON.parse(solc.compile(JSON.stringify(input), {
   import: (p) => { const f = resolve(p); return f ? { contents: readFileSync(f, 'utf8') } : { error: `not found: ${p}` }; },
@@ -45,4 +45,6 @@ for (const e of out.errors ?? []) console.error(`[${e.severity}] ${e.formattedMe
 if (errors.length) process.exit(1);
 const c = out.contracts?.['EngramRegistrar.sol']?.EngramRegistrar;
 if (!c) { console.error('EngramRegistrar did not come out of the compiler'); process.exit(1); }
+mkdirSync('artifacts', { recursive: true });
+writeFileSync('artifacts/EngramRegistrar.json', JSON.stringify({ abi: c.abi, bytecode: `0x${c.evm.bytecode.object}`, compiler: solc.version() }, null, 2) + '\n');
 console.log(`EngramRegistrar — ${c.evm.bytecode.object.length / 2} bytes of bytecode, ${c.abi.length} ABI entries (solc ${solc.version()})`);

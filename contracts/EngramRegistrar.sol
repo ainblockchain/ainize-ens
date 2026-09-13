@@ -71,6 +71,9 @@ contract EngramRegistrar {
         uint32  benchScore;     // basis points of the child's own benchmark, 10000 = all items
         bool    localityPassed; // unrelated answers survived — as strong as the product gate, no stronger
         uint64  deadline;       // signatures expire, so an old attestation cannot mint a new name
+        address recipient;
+        address resolver;
+        uint64 duration;
     }
 
     /** What a minted name is, from this contract's point of view. Children are checked against it. */
@@ -94,6 +97,9 @@ contract EngramRegistrar {
     error SignersNotDistinct(address signer);
     error Expired(uint64 deadline);
     error OnlyOwner();
+    error InvalidConfiguration();
+    error InvalidMintTarget();
+    error RootAlreadyAnchored(bytes32 label);
 
     event Minted(uint256 indexed tokenId, string label, bytes32 parentLabel, bytes32 patchSha256, uint32 benchScore, uint256 verifiers);
     event VerifierSet(address indexed verifier, bool allowed);
@@ -119,6 +125,7 @@ contract EngramRegistrar {
     modifier onlyOwner() { if (msg.sender != OWNER) revert OnlyOwner(); _; }
 
     constructor(IPermissionedRegistry registry, uint256 quorum, uint32 minBench) {
+        if (address(registry).code.length == 0 || quorum == 0 || minBench > 10000) revert InvalidConfiguration();
         REGISTRY = registry;
         OWNER = msg.sender;
         QUORUM = quorum;
@@ -128,6 +135,7 @@ contract EngramRegistrar {
     // ---------------------------------------------------------------- admin
 
     function setVerifier(address verifier, bool allowed) external onlyOwner {
+        if (verifier == address(0)) revert InvalidConfiguration();
         isVerifier[verifier] = allowed;
         emit VerifierSet(verifier, allowed);
     }
@@ -139,6 +147,8 @@ contract EngramRegistrar {
      * starts.
      */
     function anchorRoot(bytes32 label, bytes32 patchSha256) external onlyOwner {
+        if (patchSha256 == bytes32(0)) revert InvalidConfiguration();
+        if (lineageOf[label].patchSha256 != bytes32(0)) revert RootAlreadyAnchored(label);
         lineageOf[label] = Lineage({ patchSha256: patchSha256, parentLabel: bytes32(0), mintedAt: uint64(block.timestamp), benchScore: 0 });
         emit RootAnchored(label, patchSha256);
     }
@@ -150,7 +160,8 @@ contract EngramRegistrar {
         bytes32 inner = keccak256(abi.encode(
             block.chainid, address(this),
             a.parentLabel, keccak256(bytes(a.label)), a.patchSha256, a.preState,
-            a.backend, a.benchScore, a.localityPassed, a.deadline
+            a.backend, a.benchScore, a.localityPassed, a.deadline,
+            a.recipient, a.resolver, a.duration
         ));
         return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", inner));
     }
@@ -169,6 +180,8 @@ contract EngramRegistrar {
         uint64 duration,
         bytes[] calldata signatures
     ) external returns (uint256 tokenId) {
+        if (owner != a.recipient || resolver != a.resolver || duration != a.duration || owner == address(0) || duration == 0) revert InvalidMintTarget();
+        if (a.patchSha256 == bytes32(0) || a.benchScore > 10000) revert InvalidConfiguration();
         if (block.timestamp > a.deadline) revert Expired(a.deadline);
         if (a.backend != Backend.GRADIENT) revert NotGradient();
         if (!a.localityPassed) revert LocalityFailed();
