@@ -146,17 +146,21 @@ The facts for `defi.`, `vaults.` and `lending.` are already pulled and pinned �
 frontmatter scalars and table rows, never prose, never a model's summary. The lesson trains an **82-row slice**, and
 which 82 is a finding rather than a preference.
 
-The first attempt trained the sibling dataset — 119 address→symbol facts from the same pull — and the product's
-own publish gate refused it: `locality 3/10`, meaning seven unrelated answers moved. The cause was the footprint.
-Those 119 facts touched **49,825 memory rows**, 419 per fact, because a 42-character hex address tokenises long
-and gives every fact an enormous n-gram reach. A patch that rewrites fifty thousand rows disturbs answers nobody
-asked about, and more training passes raise accuracy and footprint together — the two gates move in opposite
-directions.
+Two lessons were trained and the publish gate refused both, for the same reason and not the one we expected.
 
-So the slice taken here is the part of the catalog a person asks in words: the schema terms, the policy, and each
-deployment's declared identity, with **every row carrying a hex address dropped**. `What is the layer of
-aave-amm?` → `lending` is a fact worth compiling into memory. `What is the token symbol of the vault at
-0x50379f…?` is a fact worth looking up, and the gate is what told us the difference. `risk.` is the layer we author, which is correct:
+| lesson | facts | memory rows | per fact | taught | locality |
+|---|---|---|---|---|---|
+| address → symbol | 119 | 49,825 | 419 | 6/24 | 3/10 |
+| vocabulary fields | 5 | 4,848 | **970** | **10/10** | **2/11** |
+
+The first reading was that hex addresses tokenise long and blow the footprint up. The five-fact lesson refutes
+it: no addresses in the questions at all, twice the rows per fact, and a worse locality score — from a run that
+`converged: true` and answered every one of its own questions correctly on the serving model.
+
+**So teaching less does not disturb less, and the fix is not a better slice of the catalog.** On this model,
+compiling any fact into the memory table costs several hundred rows, and those rows move answers nobody asked
+about. The gate is doing its job; what it is telling us is about the method at this scale, and it has to be
+answered there before a name in this tree can mean "this was learned without breaking anything else". `risk.` is the layer we author, which is correct:
 it is the subjective one, and a subjective layer is exactly why the tree must be a tree of forks rather than
 a canonical registry. `vaults.` also carries something no other submission will have: a **published
 benchmark** — 250 pre-registered items, a declared ordering, a measured instrument floor.
