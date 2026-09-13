@@ -20,7 +20,8 @@
  * derivative with a real parent rather than a mystery.
  */
 import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
-import { join, relative, extname } from 'node:path';
+import { join, relative, extname, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 
 const sha8 = (s) => createHash('sha256').update(s).digest('hex').slice(0, 12);
@@ -139,7 +140,9 @@ export function extract(root) {
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const root = process.argv[2] ?? 'ens/okf';
+  // `ens/okf` was this file's home inside the monorepo; the repositories are separate now and that path names
+  // nothing. The default is the `okf/` beside this file, so the command works from any directory in any clone.
+  const root = process.argv[2] && !process.argv[2].startsWith('--') ? process.argv[2] : join(dirname(fileURLToPath(import.meta.url)), 'okf');
   const { facts, skipped } = extract(root);
   const byFile = {};
   for (const f of facts) byFile[f.source.file] = (byFile[f.source.file] ?? 0) + 1;
