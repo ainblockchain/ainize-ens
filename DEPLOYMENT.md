@@ -1,5 +1,68 @@
 # Sepolia ENSv2 integration
 
+## Canonical resolver linking
+
+The latest pinned namechain deployment and the canonical Sepolia Universal
+Resolver currently point to **different registry trees**. An explicit call to
+the latest `UniversalResolverV2` implementation proves resolution only in that
+tree. It does not prove default ENS client resolution. Preserve the original
+deployment evidence as history; do not relabel its root or transactions.
+
+`scripts/link-canonical.mjs` adds a second registration of the same `.eth` label
+under the root actually returned by the canonical proxy
+`0xeEeEEEeE14D718C2B47D9923Deab1335E144EeEe`. It attaches the existing UserRegistry
+and PermissionedResolver, then updates that UserRegistry's parent pointer.
+No proxy, training registrar, or training mint is created by this linker.
+
+The [official deployment table](https://docs.ens.domains/learn/deployments/)
+links canonical-generation ABIs to `ensdomains/contracts-v2` commit
+`97a57293f3b4279d94b571e678edb53ce62638f4`. The linker fetches exactly those
+immutable artifacts, records their hashes, and verifies live code plus
+`canonical.ROOT_REGISTRY() -> root.getSubregistry('eth') -> registrar.ETH_REGISTRY()`.
+The required root is `0x8115186E8f2E0B0281e86ab91f0f48Ba90364354`, ETHRegistry is
+`0xBDC85dD5b15D7ecb354cd7cb6f2c50b4f2c4F0E2`, and registrar is
+`0xa88553f454b77203b0d036a05c894d555eaaa2cc`. Only that generation's freely mintable
+MockUSDC (`0x768f42455a2d082e23ceef7d51e5787c82d67a39`) is used for payment.
+
+```sh
+node scripts/link-canonical.mjs --check --env-file /mnt/newdata/ainize/.env
+node scripts/link-canonical.mjs --send --env-file /mnt/newdata/ainize/.env
+```
+
+Without `--send`, this script is read-only. `--source-evidence PATH` overrides
+the default `evidence/ainize-4782c76e-patch.json`. The source deployment must be
+complete, the wallet must match its owner, and pending/latest wallet nonces must
+agree before each new transaction. Do not run another transaction sender in
+parallel. The original deployment script and its journal are not modified.
+
+The linker discovers modern viem in the sibling CLI package or local
+`node_modules`; set `VIEM_MODULE_DIR` to an installed viem package directory if
+needed. It verifies viem's built-in Sepolia resolver selection and then checks
+all existing text records with ordinary `getEnsText({name,key})`, **without a
+resolver address override**. Exact EAC allowed/refused checks run again.
+
+Public additional-registration receipts and canonical resolution proof go to
+`evidence/<root>-<child>-canonical.json`. A separate git-ignored `0600` private
+journal at `evidence/private/<root>-<child>-canonical.json` stores the reveal
+secret and resumable hashes. Repeating the same command resumes that journal.
+Only `canonicalResolution.verified: true` establishes default-client resolution;
+the earlier `globalResolutionVerified` field alone does not. Secrets are omitted
+from public evidence, but reveal calldata is necessarily public on-chain.
+
+Live validation on 2026-09-13 registered `ainize-4782c76e.eth` in canonical
+ETHRegistry at block 11696550 (transaction
+`0x6af652f28f6138d21a0fcd7ac56a39f66a42c0c240828800f58327651dcd8419`).
+All eight `patch.ainize-4782c76e.eth` records resolved through default viem 2.56.5.
+The actual CLI also returned `source: on-chain` with the canonical proxy:
+
+```sh
+ainize patch patch.ainize-4782c76e.eth --resolve-only \
+  --rpc https://ethereum-sepolia-rpc.publicnode.com --ens-chain sepolia --json
+```
+
+This discovers the existing **REJECTED** DART patch plus separate Graph dataset
+provenance. It does not purchase, load, train, or attest a model.
+
 This integration uses the official `ensdomains/namechain` checkout pinned to
 `48b3e2d39513b9dd32ef1850877a29009bc807b9`, specifically
 `contracts/deployments/sepolia/*.json`. Addresses in older README examples are not
