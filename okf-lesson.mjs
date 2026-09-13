@@ -4,10 +4,11 @@
  *
  *   node okf-lesson.mjs [--out lesson.jsonl] [--root okf]
  *
- * `okf-extract.mjs` reads 1,707 facts off the pinned gateway responses. Training all of them was tried and the
- * product's own publish gate refused it: `locality 3/10`, meaning seven unrelated answers moved. The cause was
- * measured, not guessed — 119 address→symbol facts touched 49,825 memory rows, 419 per fact, because a
- * 42-character hex address tokenises long and gives every fact an enormous n-gram reach. A patch that rewrites
+ * `okf-extract.mjs` reads 1,707 facts off the pinned gateway responses. The first lesson trained a 119-fact slice
+ * of them — address→symbol, from the same pull — and the product's own publish gate refused it: `locality 3/10`,
+ * meaning that of the ten side-effect prompts repeatable on this model, seven unrelated answers moved. The cause
+ * was measured, not guessed — those 119 facts touched 49,825 memory rows, 419 per fact, because a 42-character
+ * hex address tokenises long and gives every fact an enormous n-gram reach. A patch that rewrites
  * fifty thousand rows disturbs answers nobody asked about, and more training passes raise accuracy and footprint
  * together, so the two gates move in opposite directions and there is no number of epochs that satisfies both.
  *

@@ -1,0 +1,82 @@
+{"prompt":"What type of document is aave-amm?","answer":"Subgraph Deployment"}
+{"prompt":"What is the subgraph id of aave-amm?","answer":"41ooPWnDYKwckqyG1mvg7ZEndy5zMemXinx6uQxscrBS"}
+{"prompt":"What is the layer of aave-amm?","answer":"lending"}
+{"prompt":"What is the block of aave-amm?","answer":"25902936"}
+{"prompt":"What type of document is compound-v2?","answer":"Subgraph Deployment"}
+{"prompt":"What is the subgraph id of compound-v2?","answer":"4TbqVA8p2DoBd5qDbPMwmDZv3CsJjWtxo8nVSqF2tA9a"}
+{"prompt":"What is the layer of compound-v2?","answer":"lending"}
+{"prompt":"What is the block of compound-v2?","answer":"25902936"}
+{"prompt":"What type of document is cream-finance?","answer":"Subgraph Deployment"}
+{"prompt":"What is the subgraph id of cream-finance?","answer":"43NeT7UTACLUkohKBaG7auvkhsj4Kwux9kNTJr6sFdNe"}
+{"prompt":"What is the layer of cream-finance?","answer":"lending"}
+{"prompt":"What is the block of cream-finance?","answer":"25902936"}
+{"prompt":"What type of document is dforce?","answer":"Subgraph Deployment"}
+{"prompt":"What is the subgraph id of dforce?","answer":"6PaB6tKFqrL6YoAELEhFGU6Gc39cEynLbo6ETZMF3sCy"}
+{"prompt":"What is the layer of dforce?","answer":"lending"}
+{"prompt":"What is the block of dforce?","answer":"25902936"}
+{"prompt":"What type of document is euler-finance?","answer":"Subgraph Deployment"}
+{"prompt":"What is the subgraph id of euler-finance?","answer":"95nyAWFFaiz6gykko3HtBCyhRuP5vZzuKYsZiLxHxLhr"}
+{"prompt":"What is the layer of euler-finance?","answer":"lending"}
+{"prompt":"What is the block of euler-finance?","answer":"25902936"}
+{"prompt":"What type of document is goldfinch?","answer":"Subgraph Deployment"}
+{"prompt":"What is the subgraph id of goldfinch?","answer":"GRwpFCPYyQPdz84sCnKemzrNvgFPuKkFLcRLR6jsRxHr"}
+{"prompt":"What is the layer of goldfinch?","answer":"lending"}
+{"prompt":"What is the block of goldfinch?","answer":"25902936"}
+{"prompt":"What type of document is arrakis-finance?","answer":"Subgraph Deployment"}
+{"prompt":"What is the subgraph id of arrakis-finance?","answer":"GnroBYmeLLtKuHNyTNS38hzKki5n4CWaHeaMRqZpU4cr"}
+{"prompt":"What is the layer of arrakis-finance?","answer":"vaults"}
+{"prompt":"What is the block of arrakis-finance?","answer":"25902936"}
+{"prompt":"What type of document is badgerdao?","answer":"Subgraph Deployment"}
+{"prompt":"What is the subgraph id of badgerdao?","answer":"BchjnXAXXV5coiCBMQH4A8yCHXEFX9S88JFF6G3mfem4"}
+{"prompt":"What is the layer of badgerdao?","answer":"vaults"}
+{"prompt":"What is the block of badgerdao?","answer":"25902936"}
+{"prompt":"What type of document is gamma-strategies?","answer":"Subgraph Deployment"}
+{"prompt":"What is the subgraph id of gamma-strategies?","answer":"ANz3TpZdY2syZGQvGA85ANNG7KiSWdPmv55kP4H4sRPJ"}
+{"prompt":"What is the layer of gamma-strategies?","answer":"vaults"}
+{"prompt":"What is the block of gamma-strategies?","answer":"25902936"}
+{"prompt":"What type of document is ribbon-finance?","answer":"Subgraph Deployment"}
+{"prompt":"What is the subgraph id of ribbon-finance?","answer":"Crag42fFb8PrXnbTjHe1UG5KjgzoiUJbqwzJxZ1W8XNJ"}
+{"prompt":"What is the layer of ribbon-finance?","answer":"vaults"}
+{"prompt":"What is the block of ribbon-finance?","answer":"25902936"}
+{"prompt":"What type of document is engram.eth?","answer":"Knowledge Catalog"}
+{"prompt":"What type of document is Fund Policy?","answer":"Policy"}
+{"prompt":"In the This file is a placeholder and must be written by a person of Fund Policy, what is the value for Rule minimum TVL?","answer":"1000000"}
+{"prompt":"In the This file is a placeholder and must be written by a person of Fund Policy, what is the why for Rule minimum TVL?","answer":"below this a withdrawal moves the price"}
+{"prompt":"In the This file is a placeholder and must be written by a person of Fund Policy, what is the value for Rule excluded protocol?","answer":"example-protocol"}
+{"prompt":"In the This file is a placeholder and must be written by a person of Fund Policy, what is the why for Rule excluded protocol?","answer":"unaudited"}
+{"prompt":"What type of document is DeFi Vocabulary?","answer":"Knowledge Catalog"}
+{"prompt":"What type of document is Lending Market?","answer":"Schema Term"}
+{"prompt":"In the Fields of Lending Market, what is the kind for Field `id`?","answer":"address"}
+{"prompt":"In the Fields of Lending Market, what is the meaning for Field `id`?","answer":"the market contract address, lowercase"}
+{"prompt":"In the Fields of Lending Market, what is the kind for Field `name`?","answer":"string"}
+{"prompt":"In the Fields of Lending Market, what is the meaning for Field `name`?","answer":"human-readable name"}
+{"prompt":"In the Fields of Lending Market, what is the kind for Field `inputToken`?","answer":"entity"}
+{"prompt":"In the Fields of Lending Market, what is the meaning for Field `inputToken`?","answer":"the asset supplied and borrowed"}
+{"prompt":"In the Fields of Lending Market, what is the kind for Field `rates`?","answer":"list"}
+{"prompt":"In the Fields of Lending Market, what is the meaning for Field `rates`?","answer":"rate, side and type — markets have rates, NOT fees"}
+{"prompt":"In the Fields of Lending Market, what is the kind for Field `maximumLTV`?","answer":"decimal"}
+{"prompt":"In the Fields of Lending Market, what is the meaning for Field `maximumLTV`?","answer":"loan-to-value ceiling"}
+{"prompt":"What type of document is Liquidity Pool?","answer":"Schema Term"}
+{"prompt":"In the Fields of Liquidity Pool, what is the kind for Field `id`?","answer":"address"}
+{"prompt":"In the Fields of Liquidity Pool, what is the meaning for Field `id`?","answer":"the pool contract address, lowercase"}
+{"prompt":"In the Fields of Liquidity Pool, what is the kind for Field `name`?","answer":"string"}
+{"prompt":"In the Fields of Liquidity Pool, what is the meaning for Field `name`?","answer":"human-readable name"}
+{"prompt":"In the Fields of Liquidity Pool, what is the kind for Field `symbol`?","answer":"symbol"}
+{"prompt":"In the Fields of Liquidity Pool, what is the meaning for Field `symbol`?","answer":"the LP token ticker"}
+{"prompt":"In the Fields of Liquidity Pool, what is the kind for Field `inputTokens`?","answer":"list"}
+{"prompt":"In the Fields of Liquidity Pool, what is the meaning for Field `inputTokens`?","answer":"the tokens in the pool — plural"}
+{"prompt":"In the Fields of Liquidity Pool, what is the kind for Field `fees`?","answer":"list"}
+{"prompt":"In the Fields of Liquidity Pool, what is the meaning for Field `fees`?","answer":"pool fees"}
+{"prompt":"What type of document is Vault?","answer":"Schema Term"}
+{"prompt":"In the Fields of Vault, what is the kind for Field `id`?","answer":"address"}
+{"prompt":"In the Fields of Vault, what is the meaning for Field `id`?","answer":"the vault contract address, stored lowercase"}
+{"prompt":"In the Fields of Vault, what is the kind for Field `name`?","answer":"string"}
+{"prompt":"In the Fields of Vault, what is the meaning for Field `name`?","answer":"human-readable name"}
+{"prompt":"In the Fields of Vault, what is the kind for Field `symbol`?","answer":"symbol"}
+{"prompt":"In the Fields of Vault, what is the meaning for Field `symbol`?","answer":"the share token ticker"}
+{"prompt":"In the Fields of Vault, what is the kind for Field `inputToken`?","answer":"entity"}
+{"prompt":"In the Fields of Vault, what is the meaning for Field `inputToken`?","answer":"what depositors put in"}
+{"prompt":"In the Fields of Vault, what is the kind for Field `outputToken`?","answer":"entity"}
+{"prompt":"In the Fields of Vault, what is the meaning for Field `outputToken`?","answer":"the share token they receive"}
+{"prompt":"In the Fields of Vault, what is the kind for Field `fees`?","answer":"list"}
+{"prompt":"In the Fields of Vault, what is the meaning for Field `fees`?","answer":"feeType and feePercentage — vaults have fees, NOT rates"}
